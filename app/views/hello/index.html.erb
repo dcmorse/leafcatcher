@@ -1,1 +1,11 @@
 <h1>Bike Leaf Catch</h1>
+<%= form_tag('/got-leaf', method: :post) do %>
+  <%= submit_tag('I Got One!') %>
+<% end %>
+
+<table>
+  <tr><th>Score</th><th>Email</th></tr>
+  <% User.all.order(score: :desc).each do |user| %>
+    <tr><td><%= user.score %></td><td><%= user.email %></td></tr>
+  <% end %>
+</table>
