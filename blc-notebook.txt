@@ -1,0 +1,63 @@
+Bike Leaf Catch Intruction:
+
+Table <-> ORM
+Migrations
+Routing
+Controllers
+Views
+Displaying flash notices
+Displaying a dynamic table
+
+rails new bike-leaf-catch
+cd bike-leaf-catch
+rails s
+rails generate controller
+rails generate controller Hello index
+# view the page
+em config/routes.rb # add root 'hello#index'
+em app/views/hello/index.html.erb # blow it away
+# pause here
+em Gemfile # gem 'devise'
+bundle install
+rails generate devise:install
+em config/environments/development.rb # config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+em app/views/layouts/application.html.erb # flash notices
+rails generate devise:views
+rails generate devise User
+# all that can be summed up as the next line
+git checkout devise
+rails db:migrate
+# find new routes, try out users/sign_up
+rails dbconsole # select * from users;
+rails console # User.first.email
+rails generate migration AddScoreToUsers score:integer
+cat db/migrate/20170710134800_add_score_to_users.rb
+rails db:migrate
+rails console # User.first.score -> nil # bleah!
+rails db:rollback
+em db/migrate/20170710134800_add_score_to_users.rb
+rails db:migrate
+rails console # User.first.score
+em app/views/hello/index.html.erb # add "Got One!" button
+  <%= form_tag('/got-leaf', method: :post) do %>
+    <%= submit_tag('I Got One!') %>
+  <% end %>
+em config/routes.rb # post 'got-leaf', to: 'hello#got_leaf'
+em app/controllers/hello_controller.rb # write Welcome#got_leaf method
+  def got_leaf
+    if current_user
+      current_user.score += 1           # business logic
+      current_user.save!
+      flash[:notice] = "Great Job #{current_user.email}!! You're up to #{current_user.score}! Keep riding!"
+    else
+      flash[:notice] = "You've gotta be logged in for it to count."
+    end
+    redirect_to '/'
+  end
+em app/views/hello/index.html.erb # add score table
+  <table>
+    <tr><th>Score</th><th>Email</th></tr>
+    <% User.all.order(score: :desc).each do |user| %>
+      <tr><td><%= user.score %></td><td><%= user.email %></td></tr>
+    <% end %>
+  </table>
